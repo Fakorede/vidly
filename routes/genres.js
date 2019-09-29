@@ -5,15 +5,15 @@ const router = express.Router()
 const Genre = require('../models/Genre')
 
 // endpoints
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    const genres = await Genre.find().sort('name')
     res.status(200).json({
         genres: genres
     })
 })
 
-router.get('/:id', (req, res) => {
-    const id = req.params.id
-    const genre = genres.find(g => g.id === parseInt(id))
+router.get('/:id', async (req, res) => {
+    const genre = await Genre.findById(req.params.id)
 
     if (!genre) {
         return res.status(404).json({
@@ -26,25 +26,28 @@ router.get('/:id', (req, res) => {
     })
 })
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const { error } = validateGenre(req.body)
     if (error) return res.status(400).send(error.details[0].message)
 
-    const newGenre = {
-        id: genres.length + 1,
+    let genre = new Genre({
         name: req.body.name
-    }
+    })
 
-    genres.push(newGenre)
+    genre = await genre.save()
     res.status(201).json({
         message: "Genre created successfully!",
-        genre: newGenre
+        genre: genre
     })
 })
 
-router.put('/:id', (req, res) => {
-    const id = req.params.id
-    const genre = genres.find(g => g.id === parseInt(id))
+router.put('/:id', async (req, res) => {
+    const { error } = validateGenre(req.body)
+    if (error) return res.status(400).send(error.details[0].message)
+
+    const genre = await Genre.findByIdAndUpdate(req.params.id, {
+        name: req.body.name
+    }, { new: true })
 
     if (!genre) {
         return res.status(404).json({
@@ -52,20 +55,14 @@ router.put('/:id', (req, res) => {
         })
     }
 
-    const { error } = validateGenre(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
-
-    genre.name = req.body.name
-
-    res.status(201).json({
+    res.status(200).json({
         message: "Genre updated successfully!",
         genre: genre
     })
 })
 
-router.delete('/:id', (req, res) => {
-    const id = req.params.id
-    const genre = genres.find(g => g.id === parseInt(id))
+router.delete('/:id', async (req, res) => {
+    const genre = await Genre.findByIdAndRemove(req.params.id)
 
     if (!genre) {
         return res.status(404).json({
@@ -73,10 +70,7 @@ router.delete('/:id', (req, res) => {
         })
     }
 
-    const index = genres.indexOf(genre)
-    genres.splice(index, 1)
-
-    res.status(201).json({
+    res.status(200).json({
         message: "Genre deleted successfully!"
     })
 })
