@@ -31,5 +31,7 @@ function validateCustomer(customer) {
     return Joi.validate(customer, schema);
 }
 
-module.exports = mongoose.model('Customer', customerSchema)
+const Customer = mongoose.model('Customer', customerSchema)
+
+module.exports = Customer
 exports.validate = validateCustomer
