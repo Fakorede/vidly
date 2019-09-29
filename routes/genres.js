@@ -1,10 +1,8 @@
+const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 
-const genres = [
-    { id: 1, name: 'Action' },
-    { id: 2, name: 'Horror' }
-]
+const Genre = require('../models/Genre')
 
 // endpoints
 router.get('/', (req, res) => {
