@@ -1,5 +1,7 @@
 const config = require('config')
 const mongoose = require('mongoose')
+const winston = require('winston')
+require('winston-mongodb')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 const express = require('express')
@@ -12,6 +14,18 @@ const rentals = require('./routes/rentals')
 const users = require('./routes/users')
 const auth = require('./routes/auth')
 const error = require('./middlewares/error')
+
+winston.handleExceptions(
+    new winston.transports.File({ filename: 'uncaughtExceptions.log' })
+)
+
+process.on('unhandledRejection', (ex) => {
+    winston.error(ex.message, ex)
+    process.exit(1)
+})
+
+winston.add(winston.transports.File, { filename: 'logfile.log' })
+winston.add(winston.transports.MongoDB, { db: 'mongodb://localhost/vidly', level: 'info' })
 
 if (!config.get('jwtPrivateKey')) {
     console.log('FATAL ERROR: jwtPrivateKey is not defined!')
