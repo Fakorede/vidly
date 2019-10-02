@@ -6,14 +6,8 @@ const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 const express = require('express')
 require('express-async-errors')
-
-const genres = require('./routes/genres')
-const customers = require('./routes/customers')
-const movies = require('./routes/movies')
-const rentals = require('./routes/rentals')
-const users = require('./routes/users')
-const auth = require('./routes/auth')
-const error = require('./middlewares/error')
+const app = express()
+require('./startup/routes')(app)
 
 winston.handleExceptions(
     new winston.transports.File({ filename: 'uncaughtExceptions.log' })
@@ -35,17 +29,6 @@ if (!config.get('jwtPrivateKey')) {
 mongoose.connect('mongodb://localhost/vidly')
     .then(() => console.log('Connected to mongoDB...'))
     .catch(err => console.log('Connection failed...'))
-
-const app = express()
-
-app.use(express.json())
-app.use('/api/genres', genres)
-app.use('/api/customers', customers)
-app.use('/api/movies', movies)
-app.use('/api/rentals', rentals)
-app.use('/api/users', users)
-app.use('/api/auth', auth)
-app.use(error)
 
 app.get('/', (req, res) => {
     res.send("Welcome to the Vidly Api!")
