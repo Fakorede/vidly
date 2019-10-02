@@ -1,5 +1,3 @@
-const auth = require('../middlewares/auth')
-const admin = require('../middlewares/admin')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
@@ -7,14 +5,17 @@ const router = express.Router()
 
 const { Movie, validate } = require('../models/Movie')
 const { Genre } = require('../models/Genre')
+const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
+const asyncMiddleware = require('../middlewares/async')
 
 // endpoints
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
     const movies = await Movie.find().sort('name')
     res.status(200).send(movies)
-})
+}))
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', asyncMiddleware(async (req, res) => {
     const genre = await Genre.findById(req.params.id)
 
     if (!genre) {
@@ -26,9 +27,9 @@ router.get('/:id', async (req, res) => {
     res.status(200).json({
         genres: genres
     })
-})
+}))
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
     const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -47,9 +48,9 @@ router.post('/', auth, async (req, res) => {
 
     await movie.save()
     res.status(201).send(movie)
-})
+}))
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, asyncMiddleware(async (req, res) => {
     const { error } = validate(req.body)
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -67,9 +68,9 @@ router.put('/:id', auth, async (req, res) => {
         message: "Genre updated successfully!",
         genre: genre
     })
-})
+}))
 
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
     const genre = await Genre.findByIdAndRemove(req.params.id)
 
     if (!genre) {
@@ -81,7 +82,7 @@ router.delete('/:id', [auth, admin], async (req, res) => {
     res.status(200).json({
         message: "Genre deleted successfully!"
     })
-})
+}))
 
 
 module.exports = router

@@ -1,18 +1,21 @@
-const auth = require('../middlewares/auth')
-const { Rental, validate } = require('../models/rental');
-const { Movie } = require('../models/movie');
-const { Customer } = require('../models/customer');
-const mongoose = require('mongoose');
 const Fawn = require('fawn')
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
+const { Rental, validate } = require('../models/rental');
+const { Movie } = require('../models/movie');
+const { Customer } = require('../models/customer');
+const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
+const asyncMiddleware = require('../middlewares/async')
+
 Fawn.init(mongoose)
 
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
     const rentals = await Rental.find().sort('-dateOut');
     res.send(rentals);
-});
+}));
 
 router.post('/', auth, async (req, res) => {
     const { error } = validate(req.body);
@@ -60,12 +63,12 @@ router.post('/', auth, async (req, res) => {
 
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', asyncMiddleware(async (req, res) => {
     const rental = await Rental.findById(req.params.id);
 
     if (!rental) return res.status(404).send('The rental with the given ID was not found.');
 
     res.send(rental);
-});
+}))
 
 module.exports = router; 

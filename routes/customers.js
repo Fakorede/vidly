@@ -1,11 +1,12 @@
-const auth = require('../middlewares/auth')
-const admin = require('../middlewares/admin')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 
 const { Customer, validate } = require('../models/Customer')
+const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
+// const asyncMiddleware = require('../middlewares/async')
 
 // endpoints
 router.get('/', async (req, res) => {
