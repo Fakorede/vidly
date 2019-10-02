@@ -1,4 +1,5 @@
 const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
@@ -43,7 +44,7 @@ router.put('/:id', auth, async (req, res) => {
     res.send(customer);
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     const customer = await Customer.findByIdAndRemove(req.params.id);
 
     if (!customer) return res.status(404).send('The customer with the given ID was not found.');
