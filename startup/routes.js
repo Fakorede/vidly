@@ -18,4 +18,8 @@ module.exports = function (app) {
     app.use('/api/users', users)
     app.use('/api/auth', auth)
     app.use(error)
+
+    app.get('/', (req, res) => {
+        res.send("Welcome to the Vidly Api!")
+    })
 }
