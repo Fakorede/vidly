@@ -7,6 +7,7 @@ const { Genre, validate } = require('../models/Genre')
 const auth = require('../middlewares/auth')
 const admin = require('../middlewares/admin')
 const asyncMiddleware = require('../middlewares/async')
+const validateObjectId = require('../middlewares/validateObjectId')
 
 // endpoints
 router.get('/', asyncMiddleware(async (req, res, next) => {
@@ -16,7 +17,8 @@ router.get('/', asyncMiddleware(async (req, res, next) => {
     })
 }))
 
-router.get('/:id', asyncMiddleware(async (req, res) => {
+router.get('/:id', validateObjectId, asyncMiddleware(async (req, res) => {
+
     const genre = await Genre.findById(req.params.id)
 
     if (!genre) {
