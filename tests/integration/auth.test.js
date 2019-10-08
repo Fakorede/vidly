@@ -7,9 +7,9 @@ const jwt = require('jsonwebtoken')
 describe('auth middleware', () => {
 
     beforeEach(() => { server = require('../../server') })
-    afterEach(() => {
+    afterEach(async () => {
         await Genre.remove({})
-        server.close()
+        await server.close()
     })
 
     let token

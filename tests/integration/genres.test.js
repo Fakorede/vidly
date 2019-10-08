@@ -7,8 +7,8 @@ describe('/api/genres', () => {
 
     beforeEach(() => { server = require('../../server') })
     afterEach(async () => {
-        server.close()
         await Genre.remove({})
+        await server.close()
     })
 
     describe('GET /', () => {
@@ -44,8 +44,13 @@ describe('/api/genres', () => {
         })
 
         it('should return 404 if invalid id is passed', async () => {
-
             const res = await request(server).get('/api/genres/4')
+            expect(res.status).toBe(404)
+        })
+
+        it('should return 404 if no genre with given id exists', async () => {
+            const id = mongoose.Types.ObjectId()
+            const res = await request(server).get('/api/genres/' + id)
 
             expect(res.status).toBe(404)
         })
