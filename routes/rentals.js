@@ -4,8 +4,10 @@ const express = require('express');
 const router = express.Router();
 
 const { Rental, validate } = require('../models/rental');
-const { Movie } = require('../models/movie');
-const { Customer } = require('../models/customer');
+// const { Movie } = require('../models/movie');
+// const { Customer } = require('../models/customer');
+const Movie = mongoose.model('Movie')
+const Customer = mongoose.model('Customer')
 const auth = require('../middlewares/auth')
 const admin = require('../middlewares/admin')
 const asyncMiddleware = require('../middlewares/async')

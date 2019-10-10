@@ -4,11 +4,11 @@ const genres = require('../routes/genres')
 const customers = require('../routes/customers')
 const movies = require('../routes/movies')
 const rentals = require('../routes/rentals')
-const returns = require('../routes/rrturns')
+const returns = require('../routes/returns')
 const users = require('../routes/users')
 const auth = require('../routes/auth')
 
-const error = require('./middlewares/error')
+const error = require('../middlewares/error')
 
 module.exports = function (app) {
     app.use(express.json())

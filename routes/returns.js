@@ -1,11 +1,14 @@
 const Joi = require('joi')
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose')
 
 const auth = require('../middlewares/auth')
 const validate = require('../middlewares/validate')
-const { Rental } = require('../models/Rental')
-const { Movie } = require('../models/Movie')
+const Rental = mongoose.model('Rental')
+const Movie = mongoose.model('Movie')
+// const { Rental } = require('../models/Rental')
+// const { Movie } = require('../models/Movie')
 
 router.post('/', [auth, validate(validateReturn)], async (req, res) => {
     const rental = await Rental.lookup(req.body.customerId, req.body.movieId)

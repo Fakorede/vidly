@@ -71,8 +71,6 @@ rentalSchema.methods.return = function () {
     this.rentalFee = rentalDays * this.movie.dailyRentalRat
 }
 
-const Rental = mongoose.model('Rental', rentalSchema)
-
 function validateRental(rental) {
     const schema = {
         customerId: Joi.objectId().required(),
@@ -80,6 +78,8 @@ function validateRental(rental) {
     }
     return Joi.validate(rental, schema)
 }
+
+const Rental = mongoose.model('Rental', rentalSchema)
 
 exports.Rental = Rental
 exports.validate = validateRental
