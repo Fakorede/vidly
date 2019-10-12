@@ -1,89 +1,72 @@
-const Joi = require('joi')
-const mongoose = require('mongoose')
-const express = require('express')
-const router = express.Router()
+const { Movie, validate } = require('../models/movie');
+const { Genre } = require('../models/genre');
+const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
 
-const { Movie, validate } = require('../models/Movie')
-const Genre = mongoose.model('Genre')
-// const { Genre } = require('../models/Genre')
-const auth = require('../middlewares/auth')
-const admin = require('../middlewares/admin')
-const asyncMiddleware = require('../middlewares/async')
+router.get('/', async (req, res) => {
+    const movies = await Movie.find().sort('name');
+    res.send(movies);
+});
 
-// endpoints
-router.get('/', asyncMiddleware(async (req, res) => {
-    const movies = await Movie.find().sort('name')
-    res.status(200).send(movies)
-}))
+router.post('/', async (req, res) => {
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-router.get('/:id', asyncMiddleware(async (req, res) => {
-    const genre = await Genre.findById(req.params.id)
-
-    if (!genre) {
-        return res.status(404).json({
-            message: "Genre does not exist!"
-        })
-    }
-
-    res.status(200).json({
-        genres: genres
-    })
-}))
-
-router.post('/', auth, asyncMiddleware(async (req, res) => {
-    const { error } = validate(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
-
-    const genre = await Genre.findById(req.body.genreId)
-    if (!genre) return res.status(404).send("Invalid Genre!")
+    const genre = await Genre.findById(req.body.genreId);
+    if (!genre) return res.status(400).send('Invalid genre.');
 
     const movie = new Movie({
         title: req.body.title,
         genre: {
-            _id: genreId,
+            _id: genre._id,
             name: genre.name
         },
         numberInStock: req.body.numberInStock,
         dailyRentalRate: req.body.dailyRentalRate
-    })
+    });
+    await movie.save();
 
-    await movie.save()
-    res.status(201).send(movie)
-}))
+    res.send(movie);
+});
 
-router.put('/:id', auth, asyncMiddleware(async (req, res) => {
-    const { error } = validate(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
+router.put('/:id', async (req, res) => {
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-    const genre = await Genre.findByIdAndUpdate(req.params.id, {
-        name: req.body.name
-    }, { new: true })
+    const genre = await Genre.findById(req.body.genreId);
+    if (!genre) return res.status(400).send('Invalid genre.');
 
-    if (!genre) {
-        return res.status(404).json({
-            message: "Genre does not exist!"
-        })
-    }
+    const movie = await Movie.findByIdAndUpdate(req.params.id,
+        {
+            title: req.body.title,
+            genre: {
+                _id: genre._id,
+                name: genre.name
+            },
+            numberInStock: req.body.numberInStock,
+            dailyRentalRate: req.body.dailyRentalRate
+        }, { new: true });
 
-    res.status(200).json({
-        message: "Genre updated successfully!",
-        genre: genre
-    })
-}))
+    if (!movie) return res.status(404).send('The movie with the given ID was not found.');
 
-router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
-    const genre = await Genre.findByIdAndRemove(req.params.id)
+    res.send(movie);
+});
 
-    if (!genre) {
-        return res.status(404).json({
-            message: "Genre does not exist!"
-        })
-    }
+router.delete('/:id', async (req, res) => {
+    const movie = await Movie.findByIdAndRemove(req.params.id);
 
-    res.status(200).json({
-        message: "Genre deleted successfully!"
-    })
-}))
+    if (!movie) return res.status(404).send('The movie with the given ID was not found.');
 
+    res.send(movie);
+});
 
-module.exports = router
+router.get('/:id', async (req, res) => {
+    const movie = await Movie.findById(req.params.id);
+
+    if (!movie) return res.status(404).send('The movie with the given ID was not found.');
+
+    res.send(movie);
+});
+
+module.exports = router; 
