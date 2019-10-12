@@ -1,5 +1,5 @@
-import { User } from '../../models/User';
-import { Genre } from '../../models/Genre';
+const { User } = require('../../models/User')
+const { Genre } = ('../../models/Genre')
 
 const request = require('supertest')
 const jwt = require('jsonwebtoken')
