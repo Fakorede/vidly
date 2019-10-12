@@ -1,0 +1,202 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "an api for a video rentals application",
+    "version" : "1.0",
+    "title" : "Vidly API",
+    "contact" : {
+      "name" : "Fakorede Abiola",
+      "url" : "https://fakorede.github.io",
+      "email" : "abiolafakorede@gmail.com"
+    },
+    "license" : {
+      "name" : "MIT",
+      "url" : "https://fakorede.github.io"
+    }
+  },
+  "host" : "virtserver.swaggerhub.com",
+  "basePath" : "/thefabdev/vidly/1.0",
+  "tags" : [ {
+    "name" : "rentals",
+    "description" : "Refers to a rental made by a user of the application"
+  }, {
+    "name" : "genres",
+    "description" : "Refers to a general classification for movies"
+  }, {
+    "name" : "movies",
+    "description" : "Refers to movies available for rentage"
+  }, {
+    "name" : "customers",
+    "description" : "Refers to users of this application"
+  } ],
+  "schemes" : [ "https", "http" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/movie/{id}" : {
+      "get" : {
+        "tags" : [ "movie" ],
+        "summary" : "Find movie by id",
+        "description" : "Find movie by id",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id that needs to be used for searching for a movie",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Movie"
+            }
+          },
+          "400" : {
+            "description" : "movie does not exist",
+            "schema" : {
+              "$ref" : "#/definitions/NotFoundError"
+            }
+          },
+          "default" : {
+            "description" : "error",
+            "schema" : {
+              "$ref" : "#/definitions/GeneralError"
+            }
+          }
+        },
+        "security" : [ {
+          "app_auth" : [ "create:movie", "update:movie", "deletee:movie" ]
+        } ]
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "app_auth" : {
+      "type" : "oauth2",
+      "authorizationUrl" : "http://localhost:5001/api/auth/",
+      "flow" : "implicit",
+      "scopes" : {
+        "create:movie" : "create a movie",
+        "update:movie" : "update a movie",
+        "deletee:movie" : "delete a movie"
+      }
+    }
+  },
+  "definitions" : {
+    "GeneralError" : {
+      "required" : [ "message" ],
+      "properties" : {
+        "message" : {
+          "type" : "string"
+        }
+      }
+    },
+    "NotFoundError" : {
+      "required" : [ "hint", "message" ],
+      "properties" : {
+        "message" : {
+          "type" : "string"
+        },
+        "hint" : {
+          "type" : "string"
+        }
+      }
+    },
+    "User" : {
+      "required" : [ "email", "name", "password" ],
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        },
+        "isAdmin" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "Customer" : {
+      "required" : [ "isGold", "name", "phone" ],
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "isGold" : {
+          "type" : "boolean"
+        },
+        "phone" : {
+          "type" : "string"
+        }
+      }
+    },
+    "Genre" : {
+      "required" : [ "name" ],
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "Movie" : {
+      "required" : [ "dailyRentalRate", "genre", "numberInStock", "title" ],
+      "properties" : {
+        "title" : {
+          "type" : "string"
+        },
+        "genre" : {
+          "type" : "string"
+        },
+        "numberInStock" : {
+          "type" : "number",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "dailyRentalRate" : {
+          "type" : "number",
+          "minimum" : 0,
+          "maximum" : 255
+        }
+      }
+    },
+    "Rental" : {
+      "required" : [ "customer", "dateOut", "movie" ],
+      "properties" : {
+        "customer" : {
+          "type" : "string"
+        },
+        "movie" : {
+          "type" : "string"
+        },
+        "dateOut" : {
+          "type" : "string"
+        },
+        "dateReturned" : {
+          "type" : "string"
+        },
+        "rentalFee" : {
+          "type" : "number"
+        }
+      }
+    }
+  },
+  "parameters" : {
+    "idInPath" : {
+      "name" : "id",
+      "in" : "path",
+      "description" : "id that needs to be used for searching for a movie",
+      "required" : true,
+      "type" : "string"
+    }
+  },
+  "externalDocs" : {
+    "description" : "This is an external doc created for the api",
+    "url" : "https://vidly.herokuapp.com/docs"
+  }
+}
